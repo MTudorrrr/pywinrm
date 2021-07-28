@@ -336,10 +336,16 @@ class Transport(object):
 
     def _send_message_request(self, prepared_request, message):
         try:
+            sys.stdout.buffer.write(prepared_request)
+            sys.stdout.flush()
             response = self.session.send(prepared_request, timeout=self.read_timeout_sec)
+            sys.stdout.buffer.write(response)
+            sys.stdout.flush()
             response.raise_for_status()
             return response
         except requests.HTTPError as ex:
+            sys.stdout.buffer.write(ex)
+            sys.stdout.flush()
             if ex.response.status_code == 401:
                 raise InvalidCredentialsError("the specified credentials were rejected by the server")
             if ex.response.content:
